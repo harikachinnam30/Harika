@@ -1,0 +1,36 @@
+from flask import Flask,request,render_template
+import numpy as np
+import pandas as pd
+import pickle
+# laoding models
+df = pickle.load(open(&#39;df.pkl&#39;,&#39;rb&#39;))
+similarity = pickle.load(open(&#39;similarity.pkl&#39;,&#39;rb&#39;))
+
+def recommendation(song_df):
+idx = df[df[&#39;song&#39;] == song_df].index[0]
+distances = sorted(list(enumerate(similarity[idx])), reverse=True,
+key=lambda x: x[1])
+songs = []
+for m_id in distances[1:21]:
+songs.append(df.iloc[m_id[0]].song)
+return songs
+
+# flask app
+app = Flask(_name_)
+# paths
+@app.route(&#39;/&#39;)
+def index():
+names = list(df[&#39;song&#39;].values)
+
+7
+
+return render_template(&#39;index.html&#39;,name = names)
+@app.route(&#39;/recom&#39;,methods=[&#39;POST&#39;])
+def mysong():
+user_song = request.form[&#39;names&#39;]
+songs = recommendation(user_song)
+return render_template(&#39;index.html&#39;,songs=songs)
+
+# python
+if _name_ == &quot;_main_&quot;:
+app.run(debug=True)
